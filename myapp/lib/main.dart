@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import './fileinput_web.dart' as _fileinput_web;
 import './fileinput.dart' as _fileinput;
 import 'package:image/image.dart' as img;
+import 'package:simple_cluster/simple_cluster.dart';
+//import 'dart:isolate' as iso;
 
 _fileinput.FileInputBuilder builder = _fileinput_web.FileInputBuilderWeb();
 var fileInput = builder.create(); 
@@ -62,14 +64,18 @@ class MyImage extends StatefulWidget {
 class _MyImageState extends State<MyImage> {
   bool extracting = false;
   bool extractedData = false;
-  Map<int,bool> colors = {};
+  List<int> colors = [];
 
   @override
   Widget build(BuildContext context) {
     //this.widget.data
     if(!extracting) {
       extracting = true;
+
       new Future(()async {
+        // todo isolate ...
+        Map<int,bool> colorsSet = {};
+
         // 
         print("extract binary");
         var binary = await this.widget.data.getBinaryData();
@@ -82,10 +88,20 @@ class _MyImageState extends State<MyImage> {
         for(int x = 0; x<w;x++) {
           for(int y=0;y<h;y++) {
             var pixel = image.getPixel(x, y);
-            colors[pixel.ceil()] = true;
+            colorsSet[pixel.ceil()] = true;
           }
         }
-        print("....2 ${colors.keys}");
+        print("....2 ${colorsSet.keys}");
+        colors = colorsSet.keys.toList();
+        colors.sort();
+        List<List<double>> colorsRGB = colors.map((code) {
+            int alpha = (0xff000000 & code) >> 24;
+            int red = (0x00ff0000 & code) >> 16;
+            int green = (0x0000ff00 & code) >> 8;
+            int blue = (0x000000ff & code) >> 0;
+            return [red.toDouble(), green.toDouble(), blue.toDouble()];
+        }).toList();
+        xx(colorsRGB);
         setState(() {
           extractedData = true;
         });
@@ -108,8 +124,9 @@ class _MyImageState extends State<MyImage> {
           ),
           body: Center(
             child: ListView(
-              children: colors.keys.map((e) {
-                  return Container(child: Text("${e}"),color: Color(e),);
+              children: colors.map((e) {
+                  var c = Color(e);
+                  return Container(child: Text("rgba : ${c.red} ${c.green} ${c.blue} ${c.alpha}"),color: c,);
                 }
               ).toList(),
             )
@@ -120,3 +137,27 @@ class _MyImageState extends State<MyImage> {
   }
 }
 
+
+
+
+
+xx(List<List<double>> colors){
+  print("Hello, World!! ${colors.length}");
+  
+/*
+  Hierarchical hierarchical = Hierarchical(
+    minCluster: 10, //stop at 2 cluster
+    linkage: LINKAGE.SINGLE
+  );
+  print("Hello, World!!");
+
+  List<List<int>> clusterList = hierarchical.run(colors);
+  print("===== 1 =====");
+  print("Clusters output");
+  print(clusterList);//or hierarchical.cluster
+  print("Noise");
+  print(hierarchical.noise);
+  print("Cluster label for points");
+  print(hierarchical.label);
+*/
+}
