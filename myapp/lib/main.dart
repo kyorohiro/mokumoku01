@@ -1,4 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import './fileinput_web.dart' as _fileinput_web;
+import './fileinput.dart' as _fileinput;
+
+_fileinput.FileInputBuilder builder = _fileinput_web.FileInputBuilderWeb();
+var fileInput = builder.create(); 
 
 void main() {
   runApp(MaterialApp(
@@ -6,13 +14,23 @@ void main() {
   ));
 }
 
-class  MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Center(child:Text("Hello, World!!")),
-      ),
-    );
+    return Scaffold(body: Center(child: btn()));
   }
 }
+
+Widget btn() {
+  return RaisedButton(
+    onPressed: () async {
+      print("pressed button1");
+      var dat = await fileInput.getFile();
+      print("pressed button2 ${dat}");
+
+    },
+    child: Text("File Input"),
+  );
+}
+
+

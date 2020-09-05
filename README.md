@@ -21,6 +21,15 @@ Color Picker App -san
 
 
 
+# ref
+- Input File   
+https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js
+
+
+- Images 
+https://free-images.com/display/flower_orange_calendula_bright_0.html
+
+
 
 
 
