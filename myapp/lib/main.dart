@@ -25,8 +25,11 @@ Widget btn() {
   return RaisedButton(
     onPressed: () async {
       print("pressed button1");
-      var dat = await fileInput.getFile();
-      print("pressed button2 ${dat}");
+      var files = await fileInput.getFiles();
+      print("pressed button2 ${files}");
+
+      //dat.first.getBinaryData();
+      //print("pressed button3");
 
     },
     child: Text("File Input"),

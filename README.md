@@ -1,7 +1,7 @@
 2020/09/05 mokumoku live straming memo
 
 ## Service title
-Color Picker? 
+Color Codes App
 
 ## Senario
 

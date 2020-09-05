@@ -1,9 +1,23 @@
 import 'dart:html' as html;
+import 'dart:typed_data';
 import './fileinput.dart';
 import 'dart:async';
 
 class FileInputDataWeb extends FileInputData {
-  List<html.File> files;
+  html.File file;
+  FileInputDataWeb(this.file);
+  Future<List<int>> getBinaryData() async {
+    Completer completer = new Completer();
+    html.FileReader reader = new html.FileReader();
+    reader.onLoad.listen((event) {
+      completer.complete(reader.result);
+    });
+    reader.onError.listen((event) {
+      completer.completeError(event);
+    });
+    reader.readAsArrayBuffer(this.file);
+    return completer.future;
+  }
 }
 
 class FileInputBuilderWeb extends FileInputBuilder{  
@@ -14,24 +28,24 @@ class FileInputBuilderWeb extends FileInputBuilder{
 
 class FileInputWeb implements FileInput { 
   @override
-  Future<FileInputData> getFile() {
+  Future<List<FileInputData>> getFiles(){
     print("..");
-    var completr = Completer<FileInputData>();
+    var completr = Completer<List<FileInputData>>();
     try {
       html.InputElement elm =  html.document.createElement('input');
       elm.type = 'file';
       elm.onChange.listen((event) {
         print("onchange");
-        FileInputDataWeb inputData = FileInputDataWeb();
-        inputData.files = [];
+        var data = <FileInputData>[];
         for(var f in elm.files){
           // todo
-          inputData.files.add(f);
+          data.add(FileInputDataWeb(f));
         }
-        completr.complete(inputData);
+        completr.complete(data);
       });
       elm.click();
     } catch(e) {
+      
       print("anything wrong ${3}");
       completr.completeError(e);
     }

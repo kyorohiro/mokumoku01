@@ -1,12 +1,11 @@
-class FileInputData{
+abstract class FileInputData{
+  Future<List<int>> getBinaryData(); 
 }
 
-class FileInput {
-  Future<FileInputData> getFile() {
-  }
+abstract class FileInput {
+  Future<List<FileInputData>> getFiles();
 }
 
-class FileInputBuilder {
-  FileInput create() {
-  }
+abstract class FileInputBuilder {
+  FileInput create();
 }
