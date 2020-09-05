@@ -5,12 +5,48 @@ import 'package:flutter/material.dart';
 import './fileinput_web.dart' as _fileinput_web;
 import './fileinput.dart' as _fileinput;
 import 'package:image/image.dart' as img;
-import 'package:simple_cluster/simple_cluster.dart';
-// dart:isolate is not supported on dart4web
-//import 'dart:isolate' as iso;
+
+import 'dart:html' as html;
+import 'dart:math' as math;
+
+
+const int MODE_DISPLAY_FIND_COLORS = 0;
+const int MODE_DISPLAY_SUMMARIZE_COLORS_ONLY = 1;
+int currentAppMode  = MODE_DISPLAY_SUMMARIZE_COLORS_ONLY;
+
+abstract class ColorCodeClustring {
+  Future<List<int>> compute10ColorCodes(List<int> colorCodes);
+}
+
+class ColorCodeClustringForWeb extends ColorCodeClustring {
+  
+  Future<List<int>> compute10ColorCodes(List<int> colorCodes) {
+    Completer completer = Completer<List<int>>();
+    if(!html.Worker.supported) {
+      throw UnsupportedError("html.Worker.supported");
+    }
+    var myWorker = new html.Worker("color_code_clustring.dart.js");
+
+    myWorker.onMessage.listen((event) {
+      try {
+        List<dynamic> colorsSrc = event.data["o"];
+        print("main:receive: ${event.data["o"]}");
+        completer.complete(colorsSrc.map((e) => e as int).toList());
+      } catch(e) {
+        completer.completeError(e);
+      }
+    });
+
+    myWorker.postMessage(colorCodes);  
+    return completer.future;
+  }
+}
 
 _fileinput.FileInputBuilder builder = _fileinput_web.FileInputBuilderWeb();
 var fileInput = builder.create(); 
+
+var colorCodeCluster = ColorCodeClustringForWeb();
+
 
 void main() {
   runApp(MaterialApp(
@@ -95,14 +131,10 @@ class _MyImageState extends State<MyImage> {
         print("....2 ${colorsSet.keys}");
         colors = colorsSet.keys.toList();
         colors.sort();
-        List<List<double>> colorsRGB = colors.map((code) {
-            int alpha = (0xff000000 & code) >> 24;
-            int red = (0x00ff0000 & code) >> 16;
-            int green = (0x0000ff00 & code) >> 8;
-            int blue = (0x000000ff & code) >> 0;
-            return [red.toDouble(), green.toDouble(), blue.toDouble()];
-        }).toList();
-        xx(colorsRGB);
+        if(currentAppMode == MODE_DISPLAY_SUMMARIZE_COLORS_ONLY) {
+          colors = await colorCodeCluster.compute10ColorCodes (colors);
+        }
+        //xx(colorsRGB);
         setState(() {
           extractedData = true;
         });
@@ -142,23 +174,3 @@ class _MyImageState extends State<MyImage> {
 
 
 
-xx(List<List<double>> colors){
-  print("Hello, World!! ${colors.length}");
-  
-/*
-  Hierarchical hierarchical = Hierarchical(
-    minCluster: 10, //stop at 2 cluster
-    linkage: LINKAGE.SINGLE
-  );
-  print("Hello, World!!");
-
-  List<List<int>> clusterList = hierarchical.run(colors);
-  print("===== 1 =====");
-  print("Clusters output");
-  print(clusterList);//or hierarchical.cluster
-  print("Noise");
-  print(hierarchical.noise);
-  print("Cluster label for points");
-  print(hierarchical.label);
-*/
-}
