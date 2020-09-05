@@ -6,6 +6,7 @@ import './fileinput_web.dart' as _fileinput_web;
 import './fileinput.dart' as _fileinput;
 import 'package:image/image.dart' as img;
 import 'package:simple_cluster/simple_cluster.dart';
+// dart:isolate is not supported on dart4web
 //import 'dart:isolate' as iso;
 
 _fileinput.FileInputBuilder builder = _fileinput_web.FileInputBuilderWeb();

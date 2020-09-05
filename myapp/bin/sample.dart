@@ -2,21 +2,20 @@ import 'package:simple_cluster/simple_cluster.dart';
 
 main( ){
   print("Hello, World!!");
-  List<List<double>> colors = [
-    [20, 20, 80],
-    [22, 22, 90],
-    [250, 255, 253],
-    [100, 54, 255]
+  var colors = [
+    [20.0, 20.0, 80.0],
+    [22.0, 22.0, 90.0],
+    [250.0, 255.0, 253.0],
+    [100.0, 54.0, 255.0]
   ];
 
-  List<List<double>> singles = [[7], [10], [20], [28], [35]];
 
   Hierarchical hierarchical = Hierarchical(
     minCluster: 2, //stop at 2 cluster
     linkage: LINKAGE.SINGLE
   );
 
-  List<List<int>> clusterList = hierarchical.run(colors);
+  var clusterList = hierarchical.run(colors);
 
   print("===== 1 =====");
   print("Clusters output");
@@ -25,15 +24,4 @@ main( ){
   print(hierarchical.noise);
   print("Cluster label for points");
   print(hierarchical.label);
-
-  List<List<int>> clusterList2 = hierarchical.run(singles);
-
-  print("===== 2 =====");
-  print("Clusters output");
-  print(clusterList2);//or hierarchical.cluster
-  print("Noise");
-  print(hierarchical.noise);
-  print("Cluster label for points");
-  print(hierarchical.label);
-
 }
