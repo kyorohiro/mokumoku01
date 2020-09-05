@@ -7,7 +7,7 @@ class FileInputDataWeb extends FileInputData {
   html.File file;
   FileInputDataWeb(this.file);
   Future<List<int>> getBinaryData() async {
-    Completer completer = new Completer();
+    Completer completer = new Completer<List<int>>();
     html.FileReader reader = new html.FileReader();
     reader.onLoad.listen((event) {
       completer.complete(reader.result);
