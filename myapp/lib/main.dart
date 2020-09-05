@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import './fileinput_web.dart' as _fileinput_web;
 import './fileinput.dart' as _fileinput;
+import 'package:image/image.dart' as img;
 
 _fileinput.FileInputBuilder builder = _fileinput_web.FileInputBuilderWeb();
 var fileInput = builder.create(); 
@@ -61,6 +62,7 @@ class MyImage extends StatefulWidget {
 class _MyImageState extends State<MyImage> {
   bool extracting = false;
   bool extractedData = false;
+  Map<int,bool> colors = {};
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +71,21 @@ class _MyImageState extends State<MyImage> {
       extracting = true;
       new Future(()async {
         // 
-        print("....1");
+        print("extract binary");
         var binary = await this.widget.data.getBinaryData();
-        print("${binary}");
-        //await Future.delayed(Duration(seconds: 5));
-        print("....2");
+
+        //
+        print("extract color codes");
+        img.Image image = img.decodeImage(binary);
+        int w = image.width;
+        int h = image.height;
+        for(int x = 0; x<w;x++) {
+          for(int y=0;y<h;y++) {
+            var pixel = image.getPixel(x, y);
+            colors[pixel.ceil()] = true;
+          }
+        }
+        print("....2 ${colors.keys}");
         setState(() {
           extractedData = true;
         });
@@ -95,7 +107,12 @@ class _MyImageState extends State<MyImage> {
             title: Text('Your Color Codes'),
           ),
           body: Center(
-            child: Text("Extracted Color Codes"),
+            child: ListView(
+              children: colors.keys.map((e) {
+                  return Container(child: Text("${e}"),color: Color(e),);
+                }
+              ).toList(),
+            )
           ),
       );
     }
