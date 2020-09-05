@@ -6,46 +6,17 @@ import './fileinput_web.dart' as _fileinput_web;
 import './fileinput.dart' as _fileinput;
 import 'package:image/image.dart' as img;
 
-import 'dart:html' as html;
-import 'dart:math' as math;
-
+import './colorcode_clustring.dart' as _clust;
+import './colorcode_clustring_web.dart' as _clust_web;
 
 const int MODE_DISPLAY_FIND_COLORS = 0;
 const int MODE_DISPLAY_SUMMARIZE_COLORS_ONLY = 1;
 int currentAppMode  = MODE_DISPLAY_SUMMARIZE_COLORS_ONLY;
 
-abstract class ColorCodeClustring {
-  Future<List<int>> compute10ColorCodes(List<int> colorCodes);
-}
-
-class ColorCodeClustringForWeb extends ColorCodeClustring {
-  
-  Future<List<int>> compute10ColorCodes(List<int> colorCodes) {
-    Completer completer = Completer<List<int>>();
-    if(!html.Worker.supported) {
-      throw UnsupportedError("html.Worker.supported");
-    }
-    var myWorker = new html.Worker("color_code_clustring.dart.js");
-
-    myWorker.onMessage.listen((event) {
-      try {
-        List<dynamic> colorsSrc = event.data["o"];
-        print("main:receive: ${event.data["o"]}");
-        completer.complete(colorsSrc.map((e) => e as int).toList());
-      } catch(e) {
-        completer.completeError(e);
-      }
-    });
-
-    myWorker.postMessage(colorCodes);  
-    return completer.future;
-  }
-}
-
 _fileinput.FileInputBuilder builder = _fileinput_web.FileInputBuilderWeb();
 var fileInput = builder.create(); 
 
-var colorCodeCluster = ColorCodeClustringForWeb();
+var colorCodeCluster = _clust_web.ColorCodeClustringForWeb();
 
 
 void main() {
@@ -74,13 +45,6 @@ Widget btn(BuildContext context) {
           context,
           MaterialPageRoute(builder: (context) => MyImage(files.first))
         );
-
-      //print("pressed button1");
-      //var files = await fileInput.getFiles();
-      //print("pressed button2 ${files}");
-
-      //dat.first.getBinaryData();
-      //print("pressed button3");
 
     },
     child: Text("File Input"),
