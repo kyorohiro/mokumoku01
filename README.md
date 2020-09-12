@@ -21,11 +21,9 @@ Color Picker App -san
 
 ## Matome 
 - dev.to  
-
 https://dev.to/kyorohiro/dart-x-flutter-mokumoku-live-stream-2020-09-05-30oa
 
 - qiita  
-
 https://qiita.com/kyorohiro/items/321474b511d7ed772d20
 
 
